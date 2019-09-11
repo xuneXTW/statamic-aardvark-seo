@@ -90,46 +90,7 @@
 
 {{ if baidu_verification_code }}<meta name="baidu-site-verification" content="{{ baidu_verification_code }}">{{ /if }}
 
-{{# Top level schema #}}
-<script type="application/ld+json" id="schema">
-  {
-    "@context": "http://schema.org",
-    "@type": "{{ if company_or_person === 'company' }}Organization{{ else }}Person{{ /if }}",
-    "url": "{{ site_url }}",
-    "name": "{{ if company_or_person === 'company' }}{{ company_name}}{{ else }}{{ your_name }}{{ /if }}",
-    {{ if company_or_person === 'company' && company_logo != '' }}
-    "logo": "{{ asset:company_logo }}{{ permalink }}{{ /asset:company_logo}}",
-    {{ /if }}
-    "sameAs": [
-      {{ social_links }}"{{ url}}"{{ if !last }},
-      {{ /if }}{{ /social_links }}
-    ]
-  }
-</script>
-
-{{# Breadcrumbs trail #}}
-{{ if enable_breadcrumbs && url !== '/' }}
-<script type="application/ld+json" id="breadcrumbs-ld">
-  {
-    "@context": "http://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {{ nav:breadcrumbs include_home="false" }}
-        {
-          "@type": "ListItem",
-          "position": {{ index }},
-          "name": "{{ title }}",
-          "item": "{{ permalink }}"
-        }{{ if !last }},{{ /if }}
-      {{ /nav:breadcrumbs }}
-    ]
-  }
-</script>
-{{ /if }}
-
-{{ if schema_objects }}
-  {{ schema_objects }}
-{{ /if }}
+{{ aardvark-seo:graph }}
 
 {{# Custom page scripts #}}
 {{ if head_snippets }}

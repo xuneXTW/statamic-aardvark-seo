@@ -169,6 +169,13 @@ fields:
       twitter_share_setting:
         - custom
     localizable: true
+  schema_section:
+    type: section
+    display: Schema
+    instructions: Select the schema mappings for the fields on this page
+  schema_mappings:
+    type: suggest
+    mode: AardvarkSeo.SchemaMappings
   scripts_section:
     type: section
     display: Custom Scripts
@@ -184,10 +191,4 @@ fields:
     width: 50
     display: Footer snippets
     instructions: Custom snippets to get placed in the footer, remember to wrap your scripts with `<script>` tags
-    localizable: true
-  schema_objects:
-    type: textarea
-    display: JSON-LD Schema
-    instructions: Paste your custom schema objects here (Recipe, Event etc...) - objects will need to be wrapped in `<script type="application/ld+json">` tags
-    rows: 10
     localizable: true

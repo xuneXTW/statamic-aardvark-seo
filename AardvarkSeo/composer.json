@@ -1,0 +1,14 @@
+{
+    "name": "withcandour/aardvark-seo",
+    "description": "Aardvark SEO addon for Statamic CMS",
+    "type": "statamic-addon",
+    "authors": [
+        {
+            "name": "Candour",
+            "email": "devs@withcandour.co.uk"
+        }
+    ],
+    "require": {
+        "spatie/schema-org": "^2.3"
+    }
+}

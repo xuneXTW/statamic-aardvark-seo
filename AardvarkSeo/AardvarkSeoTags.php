@@ -3,6 +3,7 @@
 namespace Statamic\Addons\AardvarkSeo;
 
 use Statamic\Addons\AardvarkSeo\Controllers\AardvarkSeoController;
+use Statamic\Addons\AardvarkSeo\Schema\SchemaGraph;
 use Statamic\API\File;
 use Statamic\API\Parse;
 use Statamic\Extend\Tags;
@@ -18,6 +19,19 @@ class AardvarkSeoTags extends Tags
     {
         $template_file = $this->getTemplateFile('aardvark-seo-head');
         return Parse::template($template_file, $this->getData());
+    }
+
+    /**
+     * Return the schema graph object
+     *
+     * @return string
+     */
+    public function graph()
+    {
+        $ctx = collect($this->context);
+        $globals = collect($this->storage->getYAML(AardvarkSeoController::STORAGE_KEY));
+        $graph = new SchemaGraph($globals, $ctx);
+        return $graph->render();
     }
 
     /**
