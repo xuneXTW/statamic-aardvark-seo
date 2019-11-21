@@ -4,8 +4,14 @@ namespace Statamic\Addons\AardvarkSeo;
 
 use Statamic\Addons\AardvarkSeo\Controllers\AardvarkSeoController;
 use Statamic\Addons\AardvarkSeo\Schema\SchemaGraph;
+use Statamic\Addons\AardvarkSeo\Controllers\DefaultsController;
+use Statamic\API\Config;
+use Statamic\API\Collection;
+use Statamic\API\Data;
 use Statamic\API\File;
 use Statamic\API\Parse;
+use Statamic\API\PageFolder;
+use Statamic\API\Taxonomy;
 use Statamic\Extend\Tags;
 
 class AardvarkSeoTags extends Tags
@@ -91,7 +97,14 @@ class AardvarkSeoTags extends Tags
     private function getData()
     {
         $ctx = collect($this->context);
-        $combinedData = collect($this->storage->getYAML(AardvarkSeoController::STORAGE_KEY))->merge($ctx);
+
+        $base = collect($this->storage->getYAML(AardvarkSeoController::STORAGE_KEY));
+        $defaults = collect($this->getDefaults($ctx, Config::getDefaultLocale()));
+        $localisedDefaults = $defaults->merge($this->getDefaults($ctx, site_locale()));
+
+        $defaultData = $base->merge($localisedDefaults);
+        $combinedData = $defaultData->merge($ctx);
+
         $this->rawData = $combinedData;
         return $this->parseData()->all();
     }
@@ -106,6 +119,7 @@ class AardvarkSeoTags extends Tags
     private function parseData()
     {
         $calculatedValues = [
+            'auto_alternate_locales' => $this->getAlternateLocales(),
             'calculated_title' => $this->getCalculatedTitleValue(),
             'calculated_twitter_card_type' => $this->getInheritedValue([
                 'twitter_card_type_page',
@@ -161,5 +175,43 @@ class AardvarkSeoTags extends Tags
             $data->get('title_separator'),
             $data->get('site_name'),
         ]);
+    }
+
+    /**
+     * Get the alternate versions of this page
+     *
+     * @return array
+     */
+    private function getAlternateLocales()
+    {
+        // Error pages
+        if (!array_key_exists('id', $this->context)) {
+            return [];
+        }
+        $data_id = $this->context['id'];
+        $data_object = Data::find($data_id);
+        if (!$data_object) {
+            return [];
+        }
+        $alternate_locales = array_diff($data_object->locales(), [site_locale()]); // Remove the current locale
+        return collect(array_values($alternate_locales))->map(function ($locale) use ($data_object) {
+            return [
+                'locale' => Config::getShortLocale($locale),
+                'url' => $data_object->in($locale)->absoluteUrl(),
+            ];
+        })->all();
+    }
+
+    /**
+     * Forward a call to the defaults controller getDefaults method
+     *
+     * @param array $ctx
+     * @param string $locale
+     *
+     * @return array
+     */
+    private function getDefaults($ctx, $locale)
+    {
+        return DefaultsController::getDefaults($ctx, $locale);
     }
 }
