@@ -90,9 +90,18 @@ class Sitemap
                 $items = Entry::query()
                     ->where('collection', $this->handle)
                     ->where('site', Site::current()->handle())
-                    ->where('redirect', '=', null)
-                    ->where('date', '<=', now()) // Exclude future posts by checking the post date is less than or equal to today
-                    ->get();
+                    ->where('date', '<=', now())
+                    ->get()
+                    ->filter(function ($entry) {
+                        if ($entry->blueprint()->handle() === 'link') {
+                            return false;
+                        }
+                        $redirect = $entry->get('redirect');
+                        if (is_string($redirect)) {
+                            return empty($redirect);
+                        }
+                        return true;
+                    });
                 break;
             case 'taxonomy':
                 $items = Term::query()
