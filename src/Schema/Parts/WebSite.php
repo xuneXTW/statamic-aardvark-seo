@@ -22,6 +22,10 @@ class WebSite implements SchemaPart
         $site->url(URL::makeAbsolute(Config::getSiteUrl()));
         $site->setProperty('publisher', ['@id' => SiteOwner::id()]);
         $site->setProperty('@id', self::id());
+        $name = $this->context->get('site_name')->value() ?? config('app.name') ?? '';
+        if ($name) {
+            $site->name($name);
+        }
         return $site;
     }
 
