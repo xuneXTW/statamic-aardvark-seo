@@ -3,9 +3,9 @@
 namespace WithCandour\AardvarkSeo\Listeners;
 
 use Statamic\Events\EntryBlueprintFound;
+use Statamic\Support\Str;
 use WithCandour\AardvarkSeo\Blueprints\CP\OnPageSeoBlueprint;
 use WithCandour\AardvarkSeo\Listeners\Contracts\SeoFieldsListener;
-use Statamic\Support\Str;
 
 class AppendEntrySeoFieldsListener implements SeoFieldsListener
 {
@@ -23,15 +23,15 @@ class AppendEntrySeoFieldsListener implements SeoFieldsListener
 
         $handle = $event->blueprint->namespace();
         if ($this->check_content_type($handle)) {
-            $bp = $event->blueprint;
-            $contents = $bp->contents();
+            $fields = OnPageSeoBlueprint::requestBlueprint()
+                ->fields()
+                ->items()
+                ->mapWithKeys(fn (array $field) => [$field['handle'] => $field['field']]);
 
-            $on_page_bp = OnPageSeoBlueprint::requestBlueprint();
-            $on_page_fields = $on_page_bp->contents()['sections']['main'];
-
-            $contents['sections']['SEO'] = $on_page_fields;
-
-            $bp->setContents($contents);
+            $event->blueprint->ensureFieldsInTab(
+                $fields,
+                'SEO'
+            );
         }
     }
 

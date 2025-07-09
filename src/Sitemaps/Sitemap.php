@@ -15,6 +15,24 @@ use WithCandour\AardvarkSeo\Blueprints\CP\SitemapSettingsBlueprint;
 class Sitemap
 {
     /**
+     * @var string
+     */
+    public $type;
+
+    /**
+     * @var string
+     */
+    public $handle;
+
+    /**
+     * @var Statamic\Sites\Site
+     */
+    public $site;
+
+    public $route;
+    public $url;
+
+    /**
      * Create a new sitemap.
      *
      * @param string $type
@@ -90,8 +108,18 @@ class Sitemap
                 $items = Entry::query()
                     ->where('collection', $this->handle)
                     ->where('site', Site::current()->handle())
-                    ->where('redirect', '=', null)
-                    ->get();
+                    ->where('date', '<=', now())
+                    ->get()
+                    ->filter(function ($entry) {
+                        if ($entry->blueprint()->handle() === 'link') {
+                            return false;
+                        }
+                        $redirect = $entry->get('redirect');
+                        if (is_string($redirect)) {
+                            return empty($redirect);
+                        }
+                        return true;
+                    });
                 break;
             case 'taxonomy':
                 $items = Term::query()

@@ -1,7 +1,7 @@
 {
     "name": "withcandour/aardvark-seo",
     "description": "Save time and get your Statamic site to rank better - Candour's SEO addon for Statamic CMS",
-    "version": "2.0.30",
+    "version": "5.0.5",
     "type": "statamic-addon",
     "keywords": [
         "Statamic",
@@ -41,6 +41,12 @@
     },
     "require": {
         "spatie/schema-org": "^3.2",
+        "statamic/cms": "^5.0",
         "whitecube/lingua": "^1.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
+        }
     }
 }
